@@ -17,7 +17,7 @@
 #include<netinet/ip_icmp.h>	//icmp帧头定义
 #include<pthread.h>		//提供多线程操作的函数
 
-#define maxbuf 2048
+#define maxbuf 20480
 
 //global
 struct scansock
@@ -36,13 +36,14 @@ struct scanbody
 	int dst_port;
 };
 
+//tcp伪头部
 struct pseudohdr
 {
 	struct in_addr src_ip;
 	struct in_addr dst_ip;
 	unsigned char zero;
-	unsigned char protocol;
-	unsigned short length;
+	unsigned char protocol;		//协议类型
+	unsigned short length;		//伪头部长度
 	//struct tcphdr tcpheader;
 };
 
@@ -53,13 +54,13 @@ struct list
 {
 	int data;
 	struct list *next;
-};
+};//链表
 
-struct list *exist_port=NULL;
+struct list *exist_port=NULL;	//结果链表头指针
 
-int con_cnt;  
-static pthread_mutex_t connect_printf_mutex = PTHREAD_MUTEX_INITIALIZER;  
-static pthread_mutex_t connect_num_mutex = PTHREAD_MUTEX_INITIALIZER; 
+int con_cnt;  	//线程个数统计
+static pthread_mutex_t connect_printf_mutex = PTHREAD_MUTEX_INITIALIZER;  	//输出线程锁
+static pthread_mutex_t connect_num_mutex = PTHREAD_MUTEX_INITIALIZER; 		//计数线程锁
 
 //tcp_syn_scan_port
 int syn_cnt;  
@@ -67,3 +68,7 @@ unsigned char flag_err, flag_port[65536];
 static pthread_mutex_t syn_printf_mutex = PTHREAD_MUTEX_INITIALIZER;  
 static pthread_mutex_t syn_num_mutex = PTHREAD_MUTEX_INITIALIZER; 
 
+//tcp_fin_scan_port
+int fin_cnt;  
+static pthread_mutex_t fin_printf_mutex = PTHREAD_MUTEX_INITIALIZER;  
+static pthread_mutex_t fin_num_mutex = PTHREAD_MUTEX_INITIALIZER;  
