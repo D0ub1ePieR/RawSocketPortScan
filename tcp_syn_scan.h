@@ -220,13 +220,13 @@ void* tcp_syn_scan(void *argv)
   
             	}  
             	while(syn_cnt > 100) 	//当前线程过多，等待1秒 
-                	sleep(1);
+                	usleep(200);
 			}
 		}
 		while (syn_cnt>0)
 		{	
 			//当前进程未执行完，等待1秒
-			sleep(1);
+			usleep(900);
 			cnt_delay++;
 			if (cnt_delay==4)	//设置延时，判断是否丢包
 			{
