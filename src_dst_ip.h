@@ -25,17 +25,17 @@ unsigned short checksum(unsigned char* buf, unsigned int len)//求报文校验�
 {
 	unsigned long sum = 0;   
 	unsigned short *pbuf;  
-    	pbuf = (unsigned short*)buf;//转化成指向16位的指针  
-    	while(len > 1)//求和  
-    	{  
-        	sum+=*pbuf++;  
-        	len-=2;  
+    pbuf = (unsigned short*)buf;//转化成指向16位的指针  
+    while(len > 1)//求和  
+    {  
+        sum+=*pbuf++;  
+        len-=2;  
    	}  
-    	if(len)//如果len为奇数，则最后剩一位要求和  
-        	sum += *(unsigned char*)pbuf;  
-    	sum = (sum>>16)+(sum & 0xffff);//  
-    	sum += (sum>>16);//上一步可能产生溢出  
-    	return (unsigned short)(~sum);
+    if(len)//如果len为奇数，则最后剩一位要求和  
+        sum += *(unsigned char*)pbuf;  
+    sum = (sum>>16)+(sum & 0xffff);//  
+    sum += (sum>>16);//上一步可能产生溢出  
+    return (unsigned short)(~sum);
 }
 
 int ping_target_by_send_icmp(char *dst_ip)	//通过构造icmp报文ping目标主机，检测是否存活
@@ -106,10 +106,10 @@ int ping_target_by_send_icmp(char *dst_ip)	//通过构造icmp报文ping目标主
 			}	
 		}
 		if( (tvend = (struct timeval*)malloc(sizeof(struct timeval))) < 0)  
-        	{  
-            		perror("malloc tvend:");  
-            		exit(0);  
-        	} 
+        {  
+            perror("malloc tvend:");  
+            exit(0);  
+        } 
 		gettimeofday(tvend, NULL);
 		t_ip=(struct ip*)recv_buf;
 		len_ip=(t_ip->ip_hl)*4;		//ip报文头部长度
@@ -122,42 +122,42 @@ int ping_target_by_send_icmp(char *dst_ip)	//通过构造icmp报文ping目标主
 			//报文校验和出错
             printf("---checksum error\tsum_recv = %d\tsum_cal = %d\n",sum_recv, sum_cal);  
         else  
-        	{  
-            	switch(t_icmp->icmp_type)  
-            	{  
-                	case ICMP_ECHOREPLY:
-						//接收到回复报文
-                        pid_t pid_now, pid_rev;  
-                       	pid_rev = t_icmp->icmp_id;  
-                       	pid_now = getpid();  
-                       	if(pid_rev != pid_now )  
-							//报文确认号不符
-                          	printf("---pid not match! pin_now = %d, pin_rev = %d\n", pid_now, pid_rev);  
-                        else  
-                          	pingflag = 1;  
-                       	inet_ntop(AF_INET, (void*)&(t_ip->ip_src), src_ip, INET_ADDRSTRLEN);  
-                        tvstart = (struct timeval*)t_icmp->icmp_data;  
-                        deltsec = (tvend->tv_sec - tvstart->tv_sec) + (tvend->tv_usec - tvstart->tv_usec)/1000000.0;  
-                       	printf("---%d bytes from %s: icmp_req=%d ttl=%d time=%4.2f ms\n", len_icmp, src_ip, t_icmp->icmp_seq, t_ip->ip_ttl, deltsec*1000);//想用整型打印的话必须强制转换！  
-                       	break;  
-                	case ICMP_TIME_EXCEEDED: 
-						//响应超时
-                       	printf("---time out!\n");  
-                        pingflag = -1;  
-                        break;  
-                	case ICMP_DEST_UNREACH: 
-						//无法连接到目标主机
-                       	inet_ntop(AF_INET, (void*)&(t_ip->ip_src), src_ip, INET_ADDRSTRLEN);  
-                       	printf("---From %s icmp_seq=%d Destination Host Unreachable\n", src_ip, t_icmp->icmp_seq);  
-                     	pingflag = -1;  
-                       	break;  
-                	default:   
-						//其他接受错误
-                        printf("recv error!\n");  
-                       	pingflag = -1;  
-                        break;  
-                }  
-           	}    	
+        {  
+            switch(t_icmp->icmp_type)  
+            {  
+                case ICMP_ECHOREPLY:
+					//接收到回复报文
+                    pid_t pid_now, pid_rev;  
+                    pid_rev = t_icmp->icmp_id;  
+                    pid_now = getpid();  
+                    if(pid_rev != pid_now )  
+					//报文确认号不符
+                    	printf("---pid not match! pin_now = %d, pin_rev = %d\n", pid_now, pid_rev);  
+                    else  
+                        pingflag = 1;  
+                    inet_ntop(AF_INET, (void*)&(t_ip->ip_src), src_ip, INET_ADDRSTRLEN);  
+                    tvstart = (struct timeval*)t_icmp->icmp_data;  
+                    deltsec = (tvend->tv_sec - tvstart->tv_sec) + (tvend->tv_usec - tvstart->tv_usec)/1000000.0;  
+                    printf("---%d bytes from %s: icmp_req=%d ttl=%d time=%4.2f ms\n", len_icmp, src_ip, t_icmp->icmp_seq, t_ip->ip_ttl, deltsec*1000);//想用整型打印的话必须强制转换！  
+                    break;  
+               	case ICMP_TIME_EXCEEDED: 
+					//响应超时
+                    printf("---time out!\n");  
+                    pingflag = -1;  
+                    break;  
+                case ICMP_DEST_UNREACH: 
+					//无法连接到目标主机
+                    inet_ntop(AF_INET, (void*)&(t_ip->ip_src), src_ip, INET_ADDRSTRLEN);  
+                    printf("---From %s icmp_seq=%d Destination Host Unreachable\n", src_ip, t_icmp->icmp_seq);  
+                    pingflag = -1;  
+                    break;  
+                default:   
+					//其他接受错误
+                    printf("recv error!\n");  
+                    pingflag = -1;  
+                    break;  
+            }  
+        }    	
 	}
 	alarm(0);
 	sigaction(SIGALRM, &oldthread, NULL);
