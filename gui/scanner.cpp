@@ -6,6 +6,7 @@
 #include "QRadialGradient"
 #include "QDebug"
 #include "QStandardItem"
+#include "QtNetwork"
 
 QString outtmp[maxbuf],porttmp[maxbuf];
 int count=0,check=0,portcount=0;
@@ -336,6 +337,7 @@ void* tcp_syn_scan_sonthread(void *argv)
     struct sockaddr_in dst_addr;
     struct pseudohdr *ppseuh;
     struct tcphdr *ptcp;
+    //synfd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);//原始套接字 tcp协议，这样接收的都是tcp包
     ppseuh=(struct pseudohdr*)sendbuf;
     ptcp=(struct tcphdr*)(sendbuf+sizeof(struct pseudohdr));
     dst_addr.sin_family = AF_INET;
@@ -394,6 +396,12 @@ void* tcp_syn_scan_recv(void *argv)
     struct scansock *curscan = (struct scansock*)argv;
 
     int synfd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
+    if(synfd < 0)
+    {
+        pthread_mutex_lock(&syn_printf_mutex);
+        perror("syn socket");
+        pthread_mutex_unlock(&syn_printf_mutex);
+    }
 
     int num_port = curscan->end_port - curscan->start_port + 1;
 
@@ -849,6 +857,8 @@ void Scanner::on_pushButton_2_clicked()
     pthread_t pidth;
     int err,choice;
 
+    ui->list->clear();
+
     scan.start_port=ui->start_port->text().toInt(&f1);
     scan.end_port=ui->end_port->text().toInt(&f2);
 
@@ -944,3 +954,4 @@ void Scanner::on_checkip_clicked()
             check=1;
         }
 }
+

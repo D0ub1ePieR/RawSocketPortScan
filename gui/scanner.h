@@ -25,6 +25,7 @@ private slots:
 
     void on_checkip_clicked();
 
+
 private:
     Ui::Scanner *ui;
 };

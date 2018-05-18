@@ -5,6 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += network
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,13 +28,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    scanner.cpp
+    scanner.cpp \
+    sniffer.cpp
 
 HEADERS += \
         mainwindow.h \
     header.h \
-    scanner.h
+    scanner.h \
+    sniffer.h \
+    sniffer_header.h
 
 FORMS += \
         mainwindow.ui \
-    scanner.ui
+    scanner.ui \
+    sniffer.ui
+RC_FILE = myapp.rc

@@ -18,6 +18,10 @@ public:
 private slots:
     void on_scanner_button_clicked();
 
+    void on_sniffer_button_clicked();
+
+    void on_exit_button_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
