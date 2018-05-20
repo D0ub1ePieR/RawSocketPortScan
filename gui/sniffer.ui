@@ -26,26 +26,6 @@
     <string>Back</string>
    </property>
   </widget>
-  <widget class="QListWidget" name="pack">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>170</y>
-     <width>401</width>
-     <height>261</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QListWidget" name="detail">
-   <property name="geometry">
-    <rect>
-     <x>455</x>
-     <y>171</y>
-     <width>231</width>
-     <height>261</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
@@ -207,6 +187,16 @@
    </property>
    <property name="text">
     <string/>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="pack">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>180</y>
+     <width>621</width>
+     <height>241</height>
+    </rect>
    </property>
   </widget>
  </widget>

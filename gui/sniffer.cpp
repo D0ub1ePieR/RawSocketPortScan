@@ -4,6 +4,7 @@
 #include "QtNetwork"
 
 int state=0;
+int err;
 
 sniffer::sniffer(QWidget *parent) :
     QDialog(parent),
@@ -63,8 +64,9 @@ void sniffer::procedure(char *interface, int fd)
     state=1;
 }
 
-void tcp_viewer()
+void sniffer::tcp_viewer()
 {
+    QString tmp;
     char logfile[]="log.txt";
     //FILE *f;
     //f=fopen(logfile,"w");
@@ -85,68 +87,78 @@ void tcp_viewer()
     {
         memset(buffer,0,sizeof(buffer));
         bytes_received = recvfrom(fd,(char *)buffer,sizeof(buffer),0,NULL,NULL);
-
-        printf(">>>");
+        ui->pack->insertPlainText(">>>");
         //fprintf(f,">>>");
         for(i = 0 ; i < bytes_received ; i++)
         {
-            printf("%02x ", (unsigned char)buffer[i]);
+            tmp.sprintf("%02x ", (unsigned char)buffer[i]);
+            ui->pack->insertPlainText(tmp);
             //fprintf(f,"%02x ",(unsigned char)buffer[i]);
             if( (i+1)%12 == 0)
             {
-                printf("\n>>>");
+                ui->pack->insertPlainText("\n>>>");
                 //fprintf(f,"\n>>>");
             }
         }
         //printf("\n");
-
-        printf("\nBytes received %5d\n",bytes_received);
+        tmp.sprintf("\nBytes received %5d\n",bytes_received);
+        ui->pack->insertPlainText(tmp);
         //fprintf(f,"\nBytes received %5d\n",bytes_received);
         ip = (struct iphdr *)buffer;                 /* 格式化buffer的内容 */
-        printf("IP hearder length %d\n",ip->tot_len);
-        printf("Protocol %d\n",ip->protocol);
+        tmp.sprintf("IP hearder length %d\n",ip->tot_len);
+        ui->pack->insertPlainText(tmp);
+        tmp.sprintf("Protocol %d\n",ip->protocol);
+        ui->pack->insertPlainText(tmp);
         //fprintf(f,"IP hearder length %d\n",ip->tot_len);
         //fprintf(f,"Protocol %d\n",ip->protocol);
         tcp = (struct tcphdr *)(buffer+sizeof(struct iphdr));    /* 格式化ip数据后面的buffer内容 */
-        printf("Source address: ");
+        ui->pack->insertPlainText("Source address: ");
         //fprintf(f,"Source address: ");
         for (i=0;i<4;i++)
         {
-            printf("%02d.",(unsigned char)*((char *)(&ip->saddr)+i));
+            tmp.sprintf("%02d.",(unsigned char)*((char *)(&ip->saddr)+i));
+            ui->pack->insertPlainText(tmp);
             //fprintf(f,"%02d.",(unsigned char)*((char *)(&ip->saddr)+i));
         }
-        printf("(");
+        ui->pack->insertPlainText("(");
         //fprintf(f,"(");
         for (i=0;i<4;i++)
         {
-            printf("%02x ",(unsigned char)*((char *)(&ip->saddr)+i));
+            tmp.sprintf("%02x ",(unsigned char)*((char *)(&ip->saddr)+i));
+            ui->pack->insertPlainText(tmp);
             //fprintf(f,"%02x ",(unsigned char)*((char *)(&ip->saddr)+i));
         }
-        printf(")\n");
-        printf("Dest address: ");
+        ui->pack->insertPlainText(")\n");
+        ui->pack->insertPlainText("Dest address: ");
         //fprintf(f,")\nDest address: ");
         for (i=0;i<4;i++)
         {
-            printf("%02d.",(unsigned char)*((char *)(&ip->daddr)+i));
+            tmp.sprintf("%02d.",(unsigned char)*((char *)(&ip->daddr)+i));
+            ui->pack->insertPlainText(tmp);
             //fprintf(f,"%02d.",(unsigned char)*((char *)(&ip->daddr)+i));
         }
-        printf("(");
+        ui->pack->insertPlainText("(");
         //fprintf(f,"(");
         for (i=0;i<4;i++)
         {
-            printf("%02x ",(unsigned char)*((char *)(&ip->daddr)+i));
+            tmp.sprintf("%02x ",(unsigned char)*((char *)(&ip->daddr)+i));
+            ui->pack->insertPlainText(tmp);
             //fprintf(f,"%02x.",(unsigned char)*((char *)(&ip->daddr)+i));
         }
-        printf(")\n");
+        ui->pack->insertPlainText(")\n");
         //fprintf(f,")\n");
-        printf("Source port %d\n",ntohs(tcp->source));
-        printf("Dest port %d \n",ntohs(tcp->dest));
-        printf("FIN:%d SYN:%d RST:%d PSH:%d ACK:%d URG:%d \n",ntohs(tcp->fin)&&1,ntohs(tcp->syn)&&1,ntohs(tcp->rst)&&1,ntohs(tcp->psh)&&1,ntohs(tcp->ack)&&1,ntohs(tcp->urg)&&1);
-        printf("-------------------------\n");
+        tmp.sprintf("Source port %d\n",ntohs(tcp->source));
+        ui->pack->insertPlainText(tmp);
+        tmp.sprintf("Dest port %d \n",ntohs(tcp->dest));
+        ui->pack->insertPlainText(tmp);
+        tmp.sprintf("FIN:%d SYN:%d RST:%d PSH:%d ACK:%d URG:%d \n",ntohs(tcp->fin)&&1,ntohs(tcp->syn)&&1,ntohs(tcp->rst)&&1,ntohs(tcp->psh)&&1,ntohs(tcp->ack)&&1,ntohs(tcp->urg)&&1);
+        ui->pack->insertPlainText(tmp);
+        ui->pack->insertPlainText("-------------------------\n");
         //fprintf(f,"Source port %d\n",ntohs(tcp->source));
         //fprintf(f,"Dest port %d \n",ntohs(tcp->dest));
         //fprintf(f,"FIN:%d SYN:%d RST:%d PSH:%d ACK:%d URG:%d \n",ntohs(tcp->fin)&&1,ntohs(tcp->syn)&&1,ntohs(tcp->rst)&&1,ntohs(tcp->psh)&&1,ntohs(tcp->ack)&&1,ntohs(tcp->urg)&&1);
         //fprintf(f,"-------------------------\n");
+        qApp->processEvents();
     }
 }
 
@@ -192,6 +204,8 @@ void sniffer::on_start_clicked()
     else
     {
         ui->tip->setText("Running...");
+        //qApp->processEvents();
         tcp_viewer();
     }
 }
+

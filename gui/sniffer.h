@@ -14,6 +14,8 @@ class sniffer : public QDialog
 public:
     explicit sniffer(QWidget *parent = 0);
     ~sniffer();
+signals:
+    void sendMessage(QString msg);
 
 private slots:
     void on_pushButton_clicked();
@@ -24,6 +26,7 @@ private slots:
     void procedure(char *interface, int fd);
 
     void on_start_clicked();
+    void tcp_viewer();
 
 private:
     Ui::sniffer *ui;
