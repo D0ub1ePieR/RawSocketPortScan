@@ -1,4 +1,6 @@
 # RawSocketPortScan
+> NUAA 计算机网络实验
+
 利用connect、tcpsyn、tcpfin实现端口扫描，使用socket
 
 # 一些注意事项
